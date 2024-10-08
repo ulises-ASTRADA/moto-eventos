@@ -107,9 +107,15 @@ const AddEventForm = ({ onSubmit }) => {
               <Field as={Input} id="twitter" name="twitter" type="url" />
             </FormControl>
 
-            <Button type="submit" colorScheme="blue" width="full">
-              Añadir evento
+            <Button
+                type="submit"
+                colorScheme="orange"  // Un tono más agresivo que refleja velocidad y energía
+                width="full"
+                _hover={{ bg: 'red.500' }}  // Un hover que resalta con un rojo brillante
+            >
+                Añadir evento
             </Button>
+
           </VStack>
         </Box>
       )}
