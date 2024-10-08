@@ -4,8 +4,13 @@ import logo from './logo.svg';
 import './App.css';
 import MainPage from './components/MainPage';
 import CalendarPage from './components/CalendarPage';
+import AddEventForm from './components/AddEventForm';
+import EventDetailsPage from './components/EventDetailsPage';
 
 function App() {
+
+  const [events, setEvents] = React.useState([]);
+
   return (
     <Router>
       <div className="App">
@@ -18,6 +23,9 @@ function App() {
             <li>
               <Link to="/calendario">Calendario</Link>
             </li>
+            <li>
+              <Link to="/formulario">Formulario para organizadores</Link>
+            </li>
           </ul>
         </nav>
 
@@ -25,6 +33,8 @@ function App() {
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/calendario" element={<CalendarPage />} />
+          <Route path="/formulario" element={<AddEventForm />} />
+          <Route path="/evento/:eventId" element={<EventDetailsPage events={events} />} />
         </Routes>
       </div>
     </Router>
