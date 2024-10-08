@@ -1,47 +1,36 @@
-// src/components/CalendarPage.jsx
-import React, { useState } from 'react';
+import React from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import AddEventForm from './AddEventForm';
-
+import { Box, Heading } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 
 // Configuración del localizador de fechas
 const localizer = momentLocalizer(moment);
 
-const CalendarPage = () => {
-  const [events, setEvents] = useState([
-    {
-      title: "Evento de ejemplo",
-      start: new Date(),
-      end: new Date(),
-      allDay: true,
-    },
-  ]);
+const CalendarPage = ({ events }) => {
+  const navigate = useNavigate();
 
-  const handleAddEvent = (values) => {
-    const newEvent = {
-      title: values.title,
-      start: new Date(values.start),
-      end: new Date(values.end),
-    };
-    setEvents([...events, newEvent]);
+  // Función para manejar la selección de un evento
+  const handleSelectEvent = (event) => {
+    const eventIndex = events.indexOf(event);
+    navigate(`/evento/${eventIndex}`);
   };
 
   return (
-    <div>
-      <h1>Calendario de Eventos</h1>
-      <Calendar
-        localizer={localizer}
-        events={events}
-        startAccessor="start"
-        endAccessor="end"
-        style={{ height: 500 }}
-      />
-
-    <h2>Añadir un nuevo evento</h2>
-    <AddEventForm onSubmit={handleAddEvent} />
-    </div>
+    <Box p={5}>
+      <Heading as="h1" mb={4}>Calendario de Eventos</Heading>
+      <Box borderWidth="1px" borderRadius="md" p={4} boxShadow="md">
+        <Calendar
+          localizer={localizer}
+          events={events}
+          startAccessor="start"
+          endAccessor="end"
+          style={{ height: 500 }}
+          onSelectEvent={handleSelectEvent}
+        />
+      </Box>
+    </Box>
   );
 };
 
