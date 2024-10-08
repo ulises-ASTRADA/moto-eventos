@@ -22,6 +22,7 @@ const EventDetailsPage = ({ events }) => {
         {event.facebook && <ListItem><Link href={event.facebook} isExternal>Facebook</Link></ListItem>}
         {event.instagram && <ListItem><Link href={event.instagram} isExternal>Instagram</Link></ListItem>}
         {event.twitter && <ListItem><Link href={event.twitter} isExternal>Twitter</Link></ListItem>}
+        {event.website && <ListItem><Link href={event.website} isExternal>Website</Link></ListItem>}
       </List>
     </Box>
   );

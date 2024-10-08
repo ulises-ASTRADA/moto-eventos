@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';  // Importa los estilos de react-datepicker
 import {
   Box,
   FormControl,
@@ -17,30 +19,38 @@ import {
 const AddEventForm = ({ onSubmit }) => {
   const navigate = useNavigate();  // Hook para la redirección
 
+  // Estados para las fechas
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+
   const initialValues = {
     title: '',
-    start: '',
-    end: '',
     description: '',
     promoCode: '',
     facebook: '',
     instagram: '',
-    twitter: ''
+    twitter: '',
+    website: ''
   };
 
   const validationSchema = Yup.object({
     title: Yup.string().required('El título es obligatorio'),
-    start: Yup.date().required('La fecha de inicio es obligatoria'),
-    end: Yup.date().required('La fecha de fin es obligatoria'),
     description: Yup.string().required('La descripción es obligatoria'),
     promoCode: Yup.string(),
     facebook: Yup.string().url('URL inválida'),
     instagram: Yup.string().url('URL inválida'),
-    twitter: Yup.string().url('URL inválida')
+    twitter: Yup.string().url('URL inválida'),
+    website: Yup.string().url('URL inválida')
   });
 
   const handleSubmit = async (values, actions) => {
-    await onSubmit(values);  // Llama a la función que agrega el evento
+    const eventDetails = {
+      ...values,
+      start: startDate,  // Agregamos la fecha de inicio
+      end: endDate       // Agregamos la fecha de fin
+    };
+
+    await onSubmit(eventDetails);  // Llama a la función que agrega el evento
     actions.setSubmitting(false);  // Desactiva el estado de "enviando"
     navigate('/calendario');  // Redirige a la página del calendario
   };
@@ -69,16 +79,32 @@ const AddEventForm = ({ onSubmit }) => {
               <FormErrorMessage>{errors.title}</FormErrorMessage>
             </FormControl>
 
-            <FormControl isInvalid={errors.start && touched.start}>
+            <FormControl>
               <FormLabel htmlFor="start">Fecha de inicio</FormLabel>
-              <Field as={Input} id="start" name="start" type="datetime-local" />
-              <FormErrorMessage>{errors.start}</FormErrorMessage>
+              <DatePicker
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                showTimeSelect
+                timeFormat="HH:mm"
+                timeIntervals={15}
+                dateFormat="dd/MM/yyyy HH:mm"  // Formato dd/MM/yyyy para las fechas
+                placeholderText="Selecciona la fecha de inicio"
+                customInput={<Input />}
+              />
             </FormControl>
 
-            <FormControl isInvalid={errors.end && touched.end}>
+            <FormControl>
               <FormLabel htmlFor="end">Fecha de fin</FormLabel>
-              <Field as={Input} id="end" name="end" type="datetime-local" />
-              <FormErrorMessage>{errors.end}</FormErrorMessage>
+              <DatePicker
+                selected={endDate}
+                onChange={(date) => setEndDate(date)}
+                showTimeSelect
+                timeFormat="HH:mm"
+                timeIntervals={15}
+                dateFormat="dd/MM/yyyy HH:mm"  // Formato dd/MM/yyyy para las fechas
+                placeholderText="Selecciona la fecha de fin"
+                customInput={<Input />}
+              />
             </FormControl>
 
             <FormControl isInvalid={errors.description && touched.description}>
@@ -107,15 +133,15 @@ const AddEventForm = ({ onSubmit }) => {
               <Field as={Input} id="twitter" name="twitter" type="url" />
             </FormControl>
 
-            <Button
-                type="submit"
-                colorScheme="orange"  // Un tono más agresivo que refleja velocidad y energía
-                width="full"
-                _hover={{ bg: 'red.500' }}  // Un hover que resalta con un rojo brillante
-            >
-                Añadir evento
-            </Button>
+            <FormControl>
+              <FormLabel htmlFor="website">Pagina web (opcional)</FormLabel>
+              <Field as={Input} id="website" name="website" type="url" />
+            </FormControl>
 
+
+            <Button type="submit" colorScheme="orange" width="full">
+              Añadir evento
+            </Button>
           </VStack>
         </Box>
       )}
