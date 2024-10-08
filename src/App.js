@@ -1,14 +1,16 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, Link, Navigate } from 'react-router-dom';
 import { Box, Flex } from '@chakra-ui/react';
 import './App.css';
 import MainPage from './components/MainPage';
 import CalendarPage from './components/CalendarPage';
 import AddEventForm from './components/AddEventForm';
+import LoginPage from './components/LoginPage';
 import EventDetailsPage from './components/EventDetailsPage';
 
 function App() {
-  const [events, setEvents] = React.useState([]);
+  const [events, setEvents] = useState([]);
+  const [userRole, setUserRole] = useState(null);  // Estado para manejar los roles (user/organizer)
 
   return (
     <Router>
@@ -26,7 +28,10 @@ function App() {
             <ul style={{ display: 'flex', gap: '15px' }}>
               <li><Link to="/" style={{ color: 'white' }}>Inicio</Link></li>
               <li><Link to="/calendario" style={{ color: 'white' }}>Calendario</Link></li>
-              <li><Link to="/formulario" style={{ color: 'white' }}>Añadir evento</Link></li>
+              {userRole === 'organizer' && (
+                <li><Link to="/formulario" style={{ color: 'white' }}>Añadir evento</Link></li>
+              )}
+              <li><Link to="/login" style={{ color: 'white' }}>Iniciar sesión</Link></li>
             </ul>
           </nav>
 
@@ -34,9 +39,20 @@ function App() {
           <Routes>
             <Route path="/" element={<MainPage events={events} />} />
             <Route path="/calendario" element={<CalendarPage events={events} setEvents={setEvents} />} />
-            <Route path="/formulario" element={<AddEventForm onSubmit={(newEvent) => {
-              setEvents([...events, newEvent]);  // Actualizamos el estado de eventos
-            }} />} />
+            <Route path="/login" element={<LoginPage setUserRole={setUserRole} />} />
+            
+            {/* Ruta protegida: Solo los organizadores pueden acceder */}
+            <Route
+              path="/formulario"
+              element={
+                userRole === 'organizer' ? (
+                  <AddEventForm onSubmit={(newEvent) => setEvents([...events, newEvent])} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+
             <Route path="/evento/:eventId" element={<EventDetailsPage events={events} />} />
           </Routes>
         </Flex>
