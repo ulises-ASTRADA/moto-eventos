@@ -1,21 +1,30 @@
-// src/components/MainPage.js
 import React from 'react';
+import { Box, Heading, Text, List, ListItem } from '@chakra-ui/react';
 
-const MainPage = () => {
+const MainPage = ({ events }) => {
   return (
-    <div>
-      <header>
-        <h1>Eventos de Motos</h1>
-        <p>Bienvenido a la plataforma donde puedes ver y organizar eventos de motos.</p>
-      </header>
-      
-      <section>
-        <h2>Próximos eventos</h2>
-        {/* Aquí iremos agregando los eventos */}
-        <p>No hay eventos disponibles por ahora.</p>
-      </section>
-    </div>
+    <Box p={5}>
+      <Heading as="h1" mb={4}>Eventos de Motos</Heading>
+      <Text fontSize="lg" mb={6}>
+        Bienvenido a la plataforma donde puedes ver y organizar eventos de motos.
+      </Text>
+
+      <Box>
+        <Heading as="h2" fontSize="xl" mb={4}>Próximos eventos</Heading>
+        {events.length > 0 ? (
+          <List spacing={3}>
+            {events.map((event, index) => (
+              <ListItem key={index} borderWidth="1px" borderRadius="md" p={4}>
+                <strong>{event.title}</strong> - {new Date(event.start).toLocaleDateString()}
+              </ListItem>
+            ))}
+          </List>
+        ) : (
+          <Text>No hay eventos disponibles por ahora.</Text>
+        )}
+      </Box>
+    </Box>
   );
-}
+};
 
 export default MainPage;

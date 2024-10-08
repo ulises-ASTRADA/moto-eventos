@@ -1,4 +1,3 @@
-// src/components/AddEventForm.jsx
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
@@ -11,11 +10,12 @@ import {
   Textarea,
   Button,
   FormErrorMessage,
-  VStack
+  VStack,
+  Heading
 } from '@chakra-ui/react';
 
 const AddEventForm = ({ onSubmit }) => {
-  const navigate = useNavigate(); // Hook para redirigir
+  const navigate = useNavigate();  // Hook para la redirección
 
   const initialValues = {
     title: '',
@@ -39,14 +39,17 @@ const AddEventForm = ({ onSubmit }) => {
     twitter: Yup.string().url('URL inválida')
   });
 
+  const handleSubmit = async (values, actions) => {
+    await onSubmit(values);  // Llama a la función que agrega el evento
+    actions.setSubmitting(false);  // Desactiva el estado de "enviando"
+    navigate('/calendario');  // Redirige a la página del calendario
+  };
+
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={(values) => {
-        onSubmit(values); // Llamamos a la función para agregar el evento
-        navigate('/calendario'); // Redirigimos a la página del calendario
-      }}
+      onSubmit={handleSubmit}
     >
       {({ handleSubmit, errors, touched }) => (
         <Box
@@ -58,6 +61,7 @@ const AddEventForm = ({ onSubmit }) => {
           boxShadow="md"
           borderRadius="md"
         >
+          <Heading as="h1" mb={6}>Añadir nuevo evento</Heading>
           <VStack spacing={4}>
             <FormControl isInvalid={errors.title && touched.title}>
               <FormLabel htmlFor="title">Título</FormLabel>
