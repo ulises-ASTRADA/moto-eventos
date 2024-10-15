@@ -117,7 +117,7 @@ const LoginPage = ({ setUserRole }) => {
             <FormControl>
               <FormLabel fontSize="sm" color="gray.800">Selecciona tu tipo de cuenta</FormLabel>
               <RadioGroup onChange={setRole} value={role}>
-                <Stack direction="row" spacing={5}>
+                <Stack direction="row" spacing={5} color="gray.800">
                   <Radio value="user">Usuario común</Radio>
                   <Radio value="organizer">Organizador</Radio>
                 </Stack>
@@ -127,7 +127,7 @@ const LoginPage = ({ setUserRole }) => {
             {/* Mostrar campos adicionales si el rol es 'organizer' */}
             {role === 'organizer' && (
               <FormControl>
-                <FormLabel fontSize="sm" color="gray.800">Organización</FormLabel>
+                <FormLabel fontSize="sm" color="gray.800">Organización o empresa</FormLabel>
                 <Input
                   type="text"
                   value={organization}
