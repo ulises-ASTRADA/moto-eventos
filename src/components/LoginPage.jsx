@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebaseConfig';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Input,
@@ -11,8 +11,6 @@ import {
   Heading,
   VStack,
   Text,
-  Radio,
-  RadioGroup,
   Stack
 } from '@chakra-ui/react';
 
@@ -20,65 +18,70 @@ const LoginPage = ({ setUserRole }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [organization, setOrganization] = useState('');
-  const [role, setRole] = useState('user');  // Estado para manejar el rol seleccionado
+  const [role, setRole] = useState('user');
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // Manejar el inicio de sesión
-  const handleLogin = async () => {
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      if (email === 'organizador@correo.com') {
-        setUserRole('organizer');
-      } else {
-        setUserRole('user');
-      }
-
-      navigate('/');  // Redirigir después de log-in
-    } catch (err) {
-      setError('Error al iniciar sesión: ' + err.message);
-    }
-  };
-
-  // Manejar el registro de una nueva cuenta
   const handleSignUp = async () => {
     try {
+      // Crear la cuenta sin iniciar sesión automáticamente
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      // Si es organizador, guardar la información adicional (puedes implementar la lógica en tu base de datos)
       if (role === 'organizer') {
-        console.log('Organización:', organization);
+        // Guardar información adicional si es necesario
       }
 
-      setUserRole(role);
-      navigate('/');
+      // Enviar correo de verificación
+      await sendEmailVerification(user);
+      setError('Te hemos enviado un correo de verificación. Por favor, revisa tu bandeja de entrada.');
+
+      // Cerrar sesión para evitar el acceso hasta la verificación
+      await auth.signOut();
+
+      setUserRole(null);
+      setIsCreatingAccount(false); // Volver a la pantalla de inicio de sesión
     } catch (err) {
       setError('Error al crear la cuenta: ' + err.message);
     }
   };
 
+  const handleLogin = async () => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Verificar si el email ha sido verificado antes de permitir el acceso
+      if (!user.emailVerified) {
+        setError('Debes verificar tu correo electrónico antes de acceder.');
+        await auth.signOut(); // Cerrar sesión si se ha iniciado automáticamente sin verificar
+        return;
+      }
+
+      // Establecer el rol basado en el estado de la cuenta (puedes ajustar la lógica según tu base de datos)
+      if (role === 'organizer') {
+        setUserRole('organizer');
+      } else {
+        setUserRole('user');
+      }
+
+      navigate('/');
+    } catch (err) {
+      setError('Error al iniciar sesión: ' + err.message);
+    }
+  };
+
   return (
-    <Box
-      p={8}
-      maxW="400px"
-      mx="auto"
-      mt={12}
-      bg="rgba(255, 255, 255, 0.9)"  // Fondo translúcido
-      borderRadius="lg"
-      boxShadow="lg"
-      border="1px solid rgba(0,0,0,0.1)"
-      textAlign="center"
-    >
-      <Heading mb={6} textAlign="center" fontSize="2xl" color="orange.400"> {/* Naranja como en MainPage */}
+    <Box p={8} maxW="400px" mx="auto" mt={12} bg="rgba(255, 255, 255, 0.9)" borderRadius="lg" boxShadow="lg" border="1px solid rgba(0,0,0,0.1)" textAlign="center">
+      <Heading mb={6} textAlign="center" fontSize="2xl" color="orange.400">
         {isCreatingAccount ? 'Crear una cuenta' : 'Iniciar sesión'}
       </Heading>
       {error && <Text color="red.500" mb={4}>{error}</Text>}
       <VStack spacing={5}>
         <FormControl>
-          <FormLabel fontSize="sm" color="gray.800">Email</FormLabel> {/* Texto en gris oscuro */}
+          <FormLabel fontSize="sm" color="gray.800">Email</FormLabel>
           <Input
             type="email"
             value={email}
@@ -86,16 +89,16 @@ const LoginPage = ({ setUserRole }) => {
             placeholder="Ingresa tu correo"
             bg="white"
             size="md"
-            color="gray.800"  // Texto del input en gris oscuro
-            _placeholder={{ color: 'gray.500' }}  // Placeholder en gris claro
+            color="gray.800"
+            _placeholder={{ color: 'gray.500' }}
             borderColor="gray.300"
-            _hover={{ borderColor: 'orange.400' }}  // Naranja claro al hover
-            focusBorderColor="orange.400"  // Naranja claro al hacer foco
+            _hover={{ borderColor: 'orange.400' }}
+            focusBorderColor="orange.400"
           />
         </FormControl>
 
         <FormControl>
-          <FormLabel fontSize="sm" color="gray.800">Contraseña</FormLabel> {/* Texto en gris oscuro */}
+          <FormLabel fontSize="sm" color="gray.800">Contraseña</FormLabel>
           <Input
             type="password"
             value={password}
@@ -103,28 +106,36 @@ const LoginPage = ({ setUserRole }) => {
             placeholder="Ingresa tu contraseña"
             bg="white"
             size="md"
-            color="gray.800"  // Texto del input en gris oscuro
-            _placeholder={{ color: 'gray.500' }}  // Placeholder en gris claro
+            color="gray.800"
+            _placeholder={{ color: 'gray.500' }}
             borderColor="gray.300"
-            _hover={{ borderColor: 'orange.400' }}  // Naranja claro al hover
-            focusBorderColor="orange.400"  // Naranja claro al hacer foco
+            _hover={{ borderColor: 'orange.400' }}
+            focusBorderColor="orange.400"
           />
         </FormControl>
 
-        {/* Mostrar la selección de rol solo al crear una cuenta */}
         {isCreatingAccount && (
           <>
             <FormControl>
               <FormLabel fontSize="sm" color="gray.800">Selecciona tu tipo de cuenta</FormLabel>
-              <RadioGroup onChange={setRole} value={role}>
-                <Stack direction="row" spacing={5} color="gray.800">
-                  <Radio value="user">Usuario común</Radio>
-                  <Radio value="organizer">Organizador</Radio>
-                </Stack>
-              </RadioGroup>
+              <Stack direction="row" spacing={4} justify="center">
+                <Button
+                  colorScheme={role === 'user' ? 'orange' : 'gray'}
+                  onClick={() => setRole('user')}
+                  variant={role === 'user' ? 'solid' : 'outline'}
+                >
+                  Usuario común
+                </Button>
+                <Button
+                  colorScheme={role === 'organizer' ? 'orange' : 'gray'}
+                  onClick={() => setRole('organizer')}
+                  variant={role === 'organizer' ? 'solid' : 'outline'}
+                >
+                  Organizador
+                </Button>
+              </Stack>
             </FormControl>
 
-            {/* Mostrar campos adicionales si el rol es 'organizer' */}
             {role === 'organizer' && (
               <FormControl>
                 <FormLabel fontSize="sm" color="gray.800">Organización o empresa</FormLabel>
