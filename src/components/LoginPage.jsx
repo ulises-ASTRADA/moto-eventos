@@ -80,6 +80,49 @@ const LoginPage = ({ setUserRole }) => {
       </Heading>
       {error && <Text color="red.500" mb={4}>{error}</Text>}
       <VStack spacing={5}>
+      {isCreatingAccount && (
+          <>
+            <FormControl>
+              <FormLabel fontSize="sm" color="gray.800">Selecciona tu tipo de cuenta (si querés agregar un evento al calendario seleccioná la opción de organizador)</FormLabel>
+              <Stack direction="row" spacing={4} justify="center">
+                <Button
+                  colorScheme={role === 'user' ? 'orange' : 'gray'}
+                  onClick={() => setRole('user')}
+                  variant={role === 'user' ? 'solid' : 'outline'}
+                >
+                  Usuario común
+                </Button>
+                <Button
+                  colorScheme={role === 'organizer' ? 'orange' : 'gray'}
+                  onClick={() => setRole('organizer')}
+                  variant={role === 'organizer' ? 'solid' : 'outline'}
+                >
+                  Organizador
+                </Button>
+              </Stack>
+            </FormControl>
+
+            {role === 'organizer' && (
+              <FormControl>
+                <FormLabel fontSize="sm" color="gray.800">Organización, empresa o grupo</FormLabel>
+                <Input
+                  type="text"
+                  value={organization}
+                  onChange={(e) => setOrganization(e.target.value)}
+                  placeholder="Ingresa la organización a la que perteneces"
+                  bg="white"
+                  size="md"
+                  color="gray.800"
+                  _placeholder={{ color: 'gray.500' }}
+                  borderColor="gray.300"
+                  _hover={{ borderColor: 'orange.400' }}
+                  focusBorderColor="orange.400"
+                />
+              </FormControl>
+            )}
+          </>
+        )}
+
         <FormControl>
           <FormLabel fontSize="sm" color="gray.800">Email</FormLabel>
           <Input
@@ -114,48 +157,6 @@ const LoginPage = ({ setUserRole }) => {
           />
         </FormControl>
 
-        {isCreatingAccount && (
-          <>
-            <FormControl>
-              <FormLabel fontSize="sm" color="gray.800">Selecciona tu tipo de cuenta</FormLabel>
-              <Stack direction="row" spacing={4} justify="center">
-                <Button
-                  colorScheme={role === 'user' ? 'orange' : 'gray'}
-                  onClick={() => setRole('user')}
-                  variant={role === 'user' ? 'solid' : 'outline'}
-                >
-                  Usuario común
-                </Button>
-                <Button
-                  colorScheme={role === 'organizer' ? 'orange' : 'gray'}
-                  onClick={() => setRole('organizer')}
-                  variant={role === 'organizer' ? 'solid' : 'outline'}
-                >
-                  Organizador
-                </Button>
-              </Stack>
-            </FormControl>
-
-            {role === 'organizer' && (
-              <FormControl>
-                <FormLabel fontSize="sm" color="gray.800">Organización o empresa</FormLabel>
-                <Input
-                  type="text"
-                  value={organization}
-                  onChange={(e) => setOrganization(e.target.value)}
-                  placeholder="Ingresa la organización a la que perteneces"
-                  bg="white"
-                  size="md"
-                  color="gray.800"
-                  _placeholder={{ color: 'gray.500' }}
-                  borderColor="gray.300"
-                  _hover={{ borderColor: 'orange.400' }}
-                  focusBorderColor="orange.400"
-                />
-              </FormControl>
-            )}
-          </>
-        )}
 
         {isCreatingAccount ? (
           <Button onClick={handleSignUp} colorScheme="orange" width="full" size="lg" borderRadius="md">

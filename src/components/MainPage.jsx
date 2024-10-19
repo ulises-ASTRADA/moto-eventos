@@ -4,7 +4,7 @@ import { Box, Heading, Text, List, ListItem, Link } from '@chakra-ui/react';
 const MainPage = ({ events }) => {
   return (
     <Box p={5}>
-      <Heading as="h1" mb={4} color="orange.400">Eventos de Motos</Heading>
+      <Heading as="h1" mb={4} color="orange.400">Moto Eventos</Heading>
       <Text fontSize="lg" mb={6}>
         Bienvenido a la plataforma donde puedes ver y organizar eventos de motos.
       </Text>
