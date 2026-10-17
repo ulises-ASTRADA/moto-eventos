@@ -1,70 +1,49 @@
-# Getting Started with Create React App
+# Moto Eventos
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React prototype for discovering motorcycle events and allowing organizers to create event listings. Visitors can browse a list, switch to a calendar, and open individual event details through a Spanish-language interface.
 
-## Available Scripts
+## Implemented experience
 
-In the project directory, you can run:
+- Event list, calendar, and detail routes built with React Router.
+- An organizer event form that updates shared React state.
+- Firebase email/password sign-in and account creation.
+- User and organizer interface paths, with Chakra UI components and motorcycle-themed styling.
 
-### `npm start`
+**Stack:** React 18, JavaScript, React Router 6, Chakra UI 2, Firebase Authentication, React Big Calendar, Moment, and Create React App.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Architecture
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+`src/App.js` owns event and role state and passes it to route components. `CalendarPage.jsx` renders the calendar, `EventDetailsPage.jsx` handles detail views, and `LoginPage.jsx` integrates Firebase Authentication. Firebase initialization lives in `src/firebaseConfig.js`.
 
-### `npm test`
+| Review area | Entry point |
+| --- | --- |
+| Routing and shared state | `src/App.js` |
+| Event creation | `src/components/AddEventForm.jsx` |
+| Calendar and event details | `src/components/CalendarPage.jsx`, `src/components/EventDetailsPage.jsx` |
+| Authentication flow | `src/components/LoginPage.jsx` |
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Run locally
 
-### `npm run build`
+```bash
+git clone https://github.com/ulises-ASTRADA/moto-eventos.git
+cd moto-eventos
+npm ci
+npm start
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Open `http://localhost:3000`. To exercise authentication, configure a Firebase project you control in `src/firebaseConfig.js`, enable email/password sign-in, and configure authorized domains. Firebase web configuration is shipped to browsers; privileged service account credentials must never be placed in this file.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+npm run build
+CI=true npm test -- --watchAll=false
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The project retains Create React App test scaffolding. Its presence does not establish coverage of authentication or event workflows.
 
-### `npm run eject`
+## Current status and limitations
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+This is a frontend prototype. Events are held in memory and reset on page reload. Organizer roles are selected or inferred in client code and are not enforced by a trusted backend. The route guard controls the interface; it must not be treated as a security boundary.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Before a production launch, persist events in a backend, enforce organizer permissions there, restore authenticated sessions reliably, and replace the generated test with workflow coverage. Any future Firebase database or storage integration must have independently reviewed access rules.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+The repository is useful for reviewing component composition, client-side routing, form flows, and an initial authentication integration.
